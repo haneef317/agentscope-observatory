@@ -1,0 +1,60 @@
+# AgentScope Observatory — full self-hosted stack
+#
+#   docker compose up --build
+#
+# Starts PostgreSQL, Redis, and the backend (which builds the React frontend
+# and serves it on the same host). Open http://localhost:8000 when ready.
+#
+# The backend entrypoint runs database migrations automatically on boot.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: agentscope
+      POSTGRES_PASSWORD: agentscope
+      POSTGRES_DB: agentscope
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentscope -d agentscope"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      # Compose service names resolve inside this network.
+      DATABASE_URL: postgresql+psycopg://agentscope:agentscope@postgres:5432/agentscope
+      REDIS_URL: redis://redis:6379/0
+      # Optional real LLM. Leave unset for zero-cost simulator mode.
+      # OPENAI_API_KEY: sk-...
+      # OPENAI_API_BASE: https://your-openai-compatible-endpoint.example.com/v1
+      # DEFAULT_MODEL: gpt-4.1-mini
+      FRONTEND_DIR: frontend/dist
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
