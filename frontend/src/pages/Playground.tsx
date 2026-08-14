@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { api, type Agent, type TraceEvent } from "../lib/api";
+import { api, apiBase, type Agent, type TraceEvent } from "../lib/api";
 import { fmtMs, fmtTime, fmtTokens, fmtUsd, prettyJson } from "../lib/format";
 
 interface ChatMsg {
@@ -34,8 +34,18 @@ export default function Playground() {
 
   useEffect(() => {
     if (!lastRunId || !running) return;
+    // Derive the WS host from the configured API base when the frontend is
+    // hosted separately (e.g. Vercel) so REST and WS never drift apart.
     const proto = location.protocol === "https:" ? "wss:" : "ws:";
-    const ws = new WebSocket(`${proto}//${location.host}/api/ws/runs/${lastRunId}`);
+    let wsUrl: string;
+    const base = apiBase();
+    if (base.startsWith("http")) {
+      const u = new URL(base);
+      wsUrl = `${proto}//${u.host}/api/ws/runs/${lastRunId}`;
+    } else {
+      wsUrl = `${proto}//${location.host}/api/ws/runs/${lastRunId}`;
+    }
+    const ws = new WebSocket(wsUrl);
     ws.onmessage = (ev) => {
       try {
         const e = JSON.parse(ev.data) as TraceEvent;

@@ -125,12 +125,26 @@ export interface Stats {
   error_types: { type: string; count: number }[];
 }
 
+/**
+ * API base URL. Defaults to the same origin (used when the FastAPI backend
+ * serves the SPA). Set VITE_API_BASE at build time — or VITE_API_BASE at
+ * runtime via `window.__API_BASE__` — to point the frontend at a remote
+ * backend (e.g. when hosting the frontend on Vercel).
+ */
+export function apiBase(): string {
+  const winBase = typeof window !== "undefined" && (window as unknown as { __API_BASE__?: string }).__API_BASE__;
+  if (winBase) return winBase.replace(/\/$/, "");
+  const envBase = import.meta.env.VITE_API_BASE as string | undefined;
+  if (envBase) return envBase.replace(/\/$/, "");
+  return "";
+}
+
 function baseHeaders(): HeadersInit {
   return { "Content-Type": "application/json" };
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${apiBase()}/api${path}`, {
     ...init,
     headers: { ...baseHeaders(), ...(init?.headers ?? {}) },
   });
@@ -211,7 +225,9 @@ export function subscribeTrace(
   function connect() {
     if (cancelled) return;
     const proto = location.protocol === "https:" ? "wss:" : "ws:";
-    ws = new WebSocket(`${proto}//${location.host}${path}`);
+    const base = apiBase();
+    const host = base.startsWith("http") ? new URL(base).host : location.host;
+    ws = new WebSocket(`${proto}//${host}${path}`);
     ws.onopen = () => opts.onOpen?.();
     ws.onmessage = (ev) => {
       try {
