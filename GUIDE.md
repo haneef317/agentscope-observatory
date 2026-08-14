@@ -159,7 +159,3 @@ Work through the project in this order. Each step is sized for one sitting (1–
 **A note on step 7:** the platform is designed to degrade gracefully. If PostgreSQL is unreachable, REST endpoints return clear errors and the WebSocket bridge degrades to in-process delivery for the current connection; if Redis is down, events still persist to the database and the UI can reload them on demand. Engineering degradation paths is what separates demo code from production code.
 
 ---
-
-## 8. Where to go next
-
-Natural extensions, roughly in difficulty order: add trace *spans* nesting (child spans for tool internals, OTel-style); add user-defined alerts on cost/latency/error thresholds with a background evaluator; add a compare-view for two runs (diff of tool calls and state); export traces as OpenTelemetry JSON; add authentication so teams can share a self-hosted instance; and replace the simple memory tracker with a generic key-value memory backend (Redis-backed `BaseStore`). Each of these is a weekend project built on top of the architecture you now understand.
