@@ -32,8 +32,7 @@ function linearScale(
   return { scale, ticks, fmt };
 }
 
-function useHoverTip<T extends { bucket: string; value: number }>(
-  data: T[],
+function useHoverTip(
   xAt: (i: number) => number,
   yAt: (i: number) => number,
 ) {
@@ -67,13 +66,13 @@ export function AreaChart({
   const n = Math.max(data.length, 1);
   const xAt = (i: number) => MARGIN.left + (i / (n - 1 || 1)) * innerW;
   const yAt = (i: number) => yScale.scale(data[i]?.value ?? 0);
-  const { tip, update, clear } = useHoverTip(data, xAt, yAt);
+  const { tip, update, clear } = useHoverTip(xAt, yAt);
   const yScale = useMemo(
     () => linearScale(data.map((d) => d.value), MARGIN.top, MARGIN.top + innerH),
     [data, innerH],
   );
 
-  const pathPoints = data.map((d, i) => [xAt(i), yAt(i)] as const);
+  const pathPoints = data.map((_, i) => [xAt(i), yAt(i)] as const);
   const line = pathPoints.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
   const area = `${line} L${xAt(n - 1).toFixed(1)},${(MARGIN.top + innerH).toFixed(1)} L${xAt(0).toFixed(1)},${(MARGIN.top + innerH).toFixed(1)} Z`;
 
@@ -159,7 +158,7 @@ export function BarChart({
   const bw = Math.max(6, innerW / n - 4);
   const xAt = (i: number) => MARGIN.left + (i + 0.5) * (innerW / n);
   const yAt = (i: number) => yScale.scale(data[i]?.value ?? 0);
-  const { tip, update, clear } = useHoverTip(data, xAt, yAt);
+  const { tip, update, clear } = useHoverTip(xAt, yAt);
 
   return (
     <svg width={width} height={height} style={{ maxWidth: "100%", height: "auto" }}>

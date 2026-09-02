@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AreaChart, BarChart } from "../components/Charts";
 import { api, type RunSummary, type Stats } from "../lib/api";
-import { fmtMs, fmtRel, fmtTokens, fmtTime, fmtUsd, shortId } from "../lib/format";
+import { fmtMs, fmtRel, fmtTokens, fmtUsd, shortId } from "../lib/format";
 
 const MAX_LABELS = 13;
 

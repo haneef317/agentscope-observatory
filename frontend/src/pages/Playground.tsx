@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api, apiBase, type Agent, type TraceEvent } from "../lib/api";
-import { fmtMs, fmtTime, fmtTokens, fmtUsd, prettyJson } from "../lib/format";
+import { fmtMs, fmtTokens, fmtUsd, prettyJson } from "../lib/format";
 
 interface ChatMsg {
   role: "user" | "assistant" | "system";

@@ -36,8 +36,8 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
     environment:
       # Compose service names resolve inside this network.
       DATABASE_URL: postgresql+psycopg://agentscope:agentscope@postgres:5432/agentscope

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { api, type RunDetail as RunDetailT, type TraceEvent } from "../lib/api";
 import { fmtMs, fmtTime, fmtTokens, fmtUsd, prettyJson, shortId, truncate } from "../lib/format";
 
@@ -273,7 +273,6 @@ export default function RunDetailPage() {
   const [run, setRun] = useState<RunDetailT | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [live, setLive] = useState(false);
-  const navigate = useNavigate();
 
   // Initial REST load
   useEffect(() => {
