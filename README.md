@@ -1,3 +1,7 @@
+
+
+https://github.com/user-attachments/assets/2172424c-27af-44fb-8445-3eab16938798
+
 # AgentScope Observatory
 
 **An open-source observability platform for LangGraph agents.**
